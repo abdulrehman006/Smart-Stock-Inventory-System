@@ -1,25 +1,29 @@
-# Laravel + React Starter Kit
+# Smart Stock Inventory System
 
-## Introduction
+## Overview
+A modern inventory management solution for retail businesses, built with Laravel and React using PrimeReact and Tailwind CSS. This system simplifies inventory operations, sales, purchases, and financial tracking with real-time insights.
 
-Our React starter kit provides a robust, modern starting point for building Laravel applications with a React frontend using [Inertia](https://inertiajs.com).
+## Installation
+1. Clone the repository: `git clone https://your-repo-url.git`
+2. Copy `.env.example` to `.env` and configure database credentials.
+3. Run `docker-compose up --build` to start the environment.
+4. Run migrations: `docker-compose exec app php artisan migrate`
+5. Install frontend dependencies: `docker-compose exec node npm install`
+6. Start the app: Access `http://localhost:8000`
 
-Inertia allows you to build modern, single-page React applications using classic server-side routing and controllers. This lets you enjoy the frontend power of React combined with the incredible backend productivity of Laravel and lightning-fast Vite compilation.
-
-This React starter kit utilizes React 19, TypeScript, Tailwind, and the [shadcn/ui](https://ui.shadcn.com) and [radix-ui](https://www.radix-ui.com) component libraries.
-
-## Official Documentation
-
-Documentation for all Laravel starter kits can be found on the [Laravel website](https://laravel.com/docs/starter-kits).
+## Usage
+- Register a new user at `/register`.
+- Log in at `/login` with admin credentials.
+- Manage users, roles, and inventory from the dashboard.
 
 ## Contributing
+- Fork the repository.
+- Create a feature branch (`git checkout -b feature/xyz`).
+- Commit changes and push to the branch.
+- Open a pull request.
 
-Thank you for considering contributing to our starter kit! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## Version
+- Initial Release: 2025-08-04
 
 ## License
-
-The Laravel + React starter kit is open-sourced software licensed under the MIT license.
+GPL-2.0+
