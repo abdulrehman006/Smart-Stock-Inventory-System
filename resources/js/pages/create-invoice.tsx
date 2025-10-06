@@ -6,15 +6,14 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
-import { Combobox } from "@/components/ui/helpers/combo-box";
-import { GripVerticalIcon, CalendarIcon } from 'lucide-react';
+import { GripVerticalIcon } from 'lucide-react';
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { Calendar } from "@/components/ui/calendar";
-import { format } from "date-fns";
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 type Customer = { id: number; name: string; email?: string; location: string; location_id: number };
 type Product = { id: number; name: string; rate: number; description: string; quantity: number; category: string; item_type: number };
@@ -56,13 +55,6 @@ type Errors = {
   server?: string;
 };
 
-// Utility function to format date as YYYY-MM-DD
-const formatDate = (date: Date): string => {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
-  return `${year}-${month}-${day}`;
-};
 
 export default function CreateInvoice() {
   const { customers, categories, sale, lastInvoiceNo } = usePage<PageProps>().props;
@@ -246,9 +238,9 @@ export default function CreateInvoice() {
 
     const invoiceData = {
       bill_no: billNo,
-      invoice_date: invoiceDate ? format(invoiceDate, "yyyy-MM-dd") : null,
+      invoice_date: invoiceDate ? invoiceDate.toISOString().split('T')[0] : null,
       sale_date: now.toISOString(),
-      due_date: dueDate ? format(dueDate, "yyyy-MM-dd") : null,
+      due_date: dueDate ? dueDate.toISOString().split('T')[0] : null,
       customer_id: customerId,
       location_id: selectedCustomer?.location_id ?? null,
       items: items
@@ -366,13 +358,21 @@ const getProductOptions = (categories: Category[]) => {
           <div className="grid grid-cols-12 gap-y-0">
             <div className="col-span-3">
               <label className="block text-sm font-medium text-gray-700">Customer</label>
-              <Combobox
-                options={customerOptions}
+              <Select
                 value={customerId?.toString() ?? ""}
-                onChange={(value) => setCustomerId(value ? parseInt(value) : null)}
-                placeholder="Select a customer..."
-                className={errors.customer ? 'border-red-500' : ''}
-              />
+                onValueChange={(value) => setCustomerId(value ? parseInt(value) : null)}
+              >
+                <SelectTrigger className={errors.customer ? 'border-red-500' : ''}>
+                  <SelectValue placeholder="Select a customer..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {customerOptions.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
               {errors.customer && (
                 <p className="mt-1 text-sm text-red-600">{errors.customer}</p>
               )}
@@ -392,51 +392,21 @@ const getProductOptions = (categories: Category[]) => {
             </div>
             <div className="col-span-2">
               <label className="block text-sm font-medium text-gray-700">Invoice date</label>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className="w-full justify-start text-left font-normal"
-                  >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {invoiceDate ? format(invoiceDate, "PPP") : "Pick a date"}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent align="start" className="p-0">
-                  <Calendar
-                    mode="single"
-                    selected={invoiceDate as Date}
-                    onSelect={(date) => setInvoiceDate(date ?? null)}
-                    initialFocus
-                    className="rounded-md border shadow-sm w-full"
-                    captionLayout="dropdown"
-                  />
-                </PopoverContent>
-              </Popover>
+              <Input
+                type="date"
+                value={invoiceDate ? invoiceDate.toISOString().split('T')[0] : ''}
+                onChange={(e) => setInvoiceDate(e.target.value ? new Date(e.target.value) : null)}
+                className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+              />
             </div>
             <div className="col-span-2">
               <label className="block text-sm font-medium text-gray-700">Due date</label>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className="w-full justify-start text-left font-normal"
-                  >
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {dueDate ? format(dueDate, "PPP") : "Pick a date"}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent align="start" className="p-0">
-                  <Calendar
-                    mode="single"
-                    selected={dueDate as Date}
-                    onSelect={(date) => setDueDate(date ?? null)}
-                    initialFocus
-                    className="rounded-md border shadow-sm w-full"
-                    captionLayout="dropdown"
-                  />
-                </PopoverContent>
-              </Popover>
+              <Input
+                type="date"
+                value={dueDate ? dueDate.toISOString().split('T')[0] : ''}
+                onChange={(e) => setDueDate(e.target.value ? new Date(e.target.value) : null)}
+                className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+              />
             </div>
             <div className="col-span-3" />
             <div className="col-span-2">
@@ -488,16 +458,24 @@ const getProductOptions = (categories: Category[]) => {
                     <td className="p-2 text-center border border-gray-300">{index + 1}</td>
                     <td className={`${item.isEditing ? 'p-0 overflow-hidden' : 'p-2'} border border-gray-300`}>
                       {item.isEditing ? (
-                        <Combobox
-                          options={getProductOptions(categories)}
+                        <Select
                           value={item.productId?.toString() ?? ""}
-                          onChange={(value) => {
+                          onValueChange={(value) => {
                             const productId = value ? Number(value) : null;
                             handleProductChange(item.id, productId);
                           }}
-                          placeholder="Select a product..."
-                          className={`w-full h-8 ${errors.items ? 'border-red-500' : ''}`}
-                        />
+                        >
+                          <SelectTrigger className={`w-full h-8 ${errors.items ? 'border-red-500' : ''}`}>
+                            <SelectValue placeholder="Select a product..." />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {getProductOptions(categories).map((option) => (
+                              <SelectItem key={option.value} value={option.value}>
+                                {option.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
                       ) : (
                         <span className="block w-full p-2 text-gray-900 text-sm h-8 leading-8">
                           {item.productId !== null && item.productId !== 0 ? (
