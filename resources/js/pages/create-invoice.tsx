@@ -268,7 +268,6 @@ export default function CreateInvoice() {
         onError: (err) => {
           setErrors({ server: "Failed to update invoice. Please try again." });
           toast.error('Failed to update invoice. Please try again.');
-          console.error("❌ Update error", err);
         },
       });
     } else {
@@ -288,7 +287,6 @@ export default function CreateInvoice() {
         onError: (err) => {
           setErrors({ server: "Failed to create invoice. Please try again." });
           toast.error('Failed to create invoice. Please try again.');
-          console.error("❌ Create error", err);
         },
       });
     }
